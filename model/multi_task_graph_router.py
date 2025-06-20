@@ -26,8 +26,9 @@ class graph_router_prediction:
         self.form_data = form_data(device)
         self.query_dim = self.query_embedding_list.shape[1]
         self.llm_dim = self.llm_description_embedding.shape[1]
+        self.in_edges_size = 1 + self.combined_edge.shape[1]
         self.GNN_predict = GNN_prediction(query_feature_dim=self.query_dim, llm_feature_dim=self.llm_dim,
-                                    hidden_features_size=self.config['embedding_dim'], in_edges_size=self.config['edge_dim'],wandb=self.wandb,config=self.config,device=device)
+                                    hidden_features_size=self.config['embedding_dim'], in_edges_size=self.in_edges_size,wandb=self.wandb,config=self.config,device=device)
         print("GNN training successfully initialized.")
         self.train_GNN()
 

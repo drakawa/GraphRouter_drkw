@@ -5,6 +5,7 @@ from torch_geometric.data import Data
 import torch.nn as nn
 from torch.optim import AdamW
 from sklearn.metrics import f1_score
+import numpy as np
 
 class FeatureAlign(nn.Module):
 
@@ -65,8 +66,12 @@ class form_data:
         llm_indices = [i + len(query_indices) for i in range(len(llm_features))]
         des_node=[(i+1 + org_node[-1]) for i in des_node]
         edge_index = torch.tensor([org_node, des_node], dtype=torch.long).to(self.device)
-        edge_weight = torch.tensor(edge_feature, dtype=torch.float).reshape(-1,1).to(self.device)
-        combined_edge=torch.tensor(combined_edge, dtype=torch.float).reshape(-1,2).to(self.device)
+        # edge_weight = torch.tensor(edge_feature, dtype=torch.float).reshape(-1,1).to(self.device)
+        # combined_edge=torch.tensor(combined_edge, dtype=torch.float).reshape(-1,2).to(self.device)
+        print(edge_feature.shape, combined_edge.shape)
+        edge_weight = torch.from_numpy(edge_feature.astype(np.float32)).clone().reshape(-1,1).to(self.device)
+        combined_edge=torch.from_numpy(combined_edge.astype(np.float32)).clone().reshape(edge_feature.shape[0],-1).to(self.device)
+        print(edge_weight.shape, combined_edge.shape)
         combined_edge=torch.cat((edge_weight, combined_edge), dim=-1)
         data = Data(task_id=task_id,query_features=query_features, llm_features=llm_features, edge_index=edge_index,
                         edge_attr=edge_weight,query_indices=query_indices, llm_indices=llm_indices,label=torch.tensor(label, dtype=torch.float).to(self.device),
